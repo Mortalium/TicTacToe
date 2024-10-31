@@ -8,51 +8,59 @@ const wss = new WebSocket.Server({ server });
 
 const db = new sqlite3.Database("../res/game_data.db");
 
+const gameLocked = false;
+var otherPlayer;
+
 let sessions = {}
 
 wss.on('connection', (ws, req) => {
     ws.on('message', (message) => {
-      const data = JSON.parse(message);
-      if (data.type === 'join') {
-        if (sessions[sessionId] != null){
-            
-            const sessionId = data.sessionId;
-
-            sessions[sessionId].push(ws);
-    
-        }
-       
-      } else if (data.type === "new") {
-        sessionId = this.startGame()
-        sessions[sessionId] = [];
-        sessions[sessionId].push(ws);
-
-      } else if (data.type === "update") {
-        const sessionId = data.sessionId;
-        this.updateGame(data.board, sessionId);
-        winnerVar = this.checkWinner(data.board);
-        if(winnerVar != null){
-            ws.send(JSON.stringify({type: 'win'}));
-
+        if(sessions[sessionId]){
             sessions[sessionId].forEach(client => {
                 if (client !== ws) {
-                    client.send(JSON.stringify({ type: 'loss'}));
+                    otherPlayer = client;
                 }
             });
-        }else{
-            if(this.isBoardFull){
-                sessions[sessionId].forEach(client => {
-                    client.send(JSON.stringify({ type: 'even'}));
-                });
-            }
         }
+        const data = JSON.parse(message);
+        if (data.type === 'join') {
+            if (sessions[sessionId] != null){
+                
+                const sessionId = data.sessionId;
 
-        sessions[sessionId].forEach(client => {
-            if (client !== ws) {
-                client.send(JSON.stringify({ type: 'update', message: 'Player joined' }));
+                sessions[sessionId].push(ws);
+
+                otherPlayer.send(JSON.stringify({type: 'unlock'}));
             }
-        });
-      }
+        
+        } else if (data.type === "new") {
+            sessionId = this.startGame()
+            sessions[sessionId] = [];
+            sessions[sessionId].push(ws);
+
+        } else if (data.type === "update") {
+            const sessionId = data.sessionId;
+            this.updateGame(data.board, sessionId);
+            otherPlayer.send(JSON.stringify({ type: 'update', board: data.board }));
+
+            winnerVar = this.checkWinner(data.board);
+            if(winnerVar != null){
+                ws.send(JSON.stringify({type: 'win'}));
+                otherPlayer.send(JSON.stringify({ type: 'loss'}));
+                gameLocked = true;
+            }else if(this.isBoardFull){
+                ws.send(JSON.stringify({ type: 'even'}));
+                otherPlayer.send(JSON.stringify({ type: 'even'}));
+                gameLocked = true;
+            } else{
+                ws.send(JSON.stringify({ type: 'lock'}));
+                otherPlayer.send(JSON.stringify({type: 'unlock'}));
+            }
+            if(gameLocked){
+                ws.send(JSON.stringify({type: 'lock'}));
+                otherPlayer.send(JSON.stringify({ type: 'lock'}));
+            }
+        } 
     });
   });
 

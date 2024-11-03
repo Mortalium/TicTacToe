@@ -13,7 +13,8 @@ import { initializeSocket } from '@/ServiceWebsocket';
 <script>
 const socket = new WebSocket('ws://localhost:3000');
 function new_game(){
-  initializeSocket();
+  socket = initializeSocket();
+  socket.send(JSON.stringify({type:'new'}))
 }
 
 </script>

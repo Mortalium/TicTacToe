@@ -25,6 +25,7 @@ let sessions = {}
 
 wss.on('connection', (ws, req) => {
     ws.on('message', (message) => {
+        const data = JSON.parse(message);
         if(sessions[sessionId]){
             sessions[sessionId].forEach(client => {
                 if (client !== ws) {
@@ -32,7 +33,6 @@ wss.on('connection', (ws, req) => {
                 }
             });
         }
-        const data = JSON.parse(message);
         if (data.type === 'join') {
             if (sessions[sessionId] != null){
                 
@@ -41,6 +41,10 @@ wss.on('connection', (ws, req) => {
                 sessions[sessionId].push(ws);
 
                 otherPlayer.send(JSON.stringify({type: 'unlock'}));
+
+                ws.send(JSON.stringify({type: 'validation', valid:true}))
+            } else {
+                ws.send(JSON.stringify({type: 'validation', valid:false}))
             }
         
         } else if (data.type === "new") {

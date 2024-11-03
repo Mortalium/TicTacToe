@@ -8,13 +8,13 @@
 <script setup>
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
 import { RouterLink } from 'vue-router';
-import { initializeSocket } from '@/ServiceWebsocket';
+import { initializeSocket,setSymbol } from '@/ServiceWebsocket';
 </script>
 <script>
-const socket = new WebSocket('ws://localhost:3000');
 function new_game(){
-  socket = initializeSocket();
+  let socket = initializeSocket();
   socket.send(JSON.stringify({type:'new'}))
+  setSymbol("x")
 }
 
 </script>

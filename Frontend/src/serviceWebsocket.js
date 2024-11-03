@@ -1,6 +1,13 @@
 import { useRouter } from 'vue-router';
+import mitt from 'mitt';
+
+const emitter = mitt();
+
+export const eventBus = emitter;
 
 var sessionId;
+
+var symbol;
 
 export function initializeSocket() {
   socket = new WebSocket('ws://localhost:3000');
@@ -8,7 +15,7 @@ export function initializeSocket() {
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (data.type === 'update') {
-      
+      emitter.emit('buttonUpdate',data)
     }else if(data.type === 'win'){
   
     }else if(data.type === 'loss'){
@@ -23,9 +30,10 @@ export function initializeSocket() {
       if(data.valid){
         const router = useRouter();
         router.push('/Game');
+        setSymbol("o");
       }
     }else if(data.type === 'new_response'){
-      setSessionID(data.sessionId)
+      setSessionID(data.sessionId);
     }
   socket.onclose = () => console.log('Socket geschlossen');
   return socket;
@@ -46,4 +54,12 @@ export function setSessionID(sessionId){
 
 export function getSessionID(){
   return this.sessionId;
+}
+
+export function setSymbol(symbol){
+  this.symbol = symbol;
+}
+
+export function getSymbol(){
+  return symbol;
 }

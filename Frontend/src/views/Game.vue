@@ -58,7 +58,7 @@ function handleButtonUpdate(data){
     let i = 0;
     for (let row of Object.values(data.board)) {
         for (let col of Object.values(row)){
-            button = buttons.value[i];
+            let button = buttons.value[i];
 
             button.textContent = col.value;
             i++;
@@ -67,35 +67,37 @@ function handleButtonUpdate(data){
 }
 
 function sendData(rowIndex,colIndex){
-    board = {
-        "a": {
-            "1":"",
-            "2":"",
-            "3":"",
-        },
-        "b":{
-            "1":"",
-            "2":"",
-            "3":"",
-        },
-        "c":{
-            "1":"",
-            "2":"",
-            "3":"",
-        },
-    };
-    buttons[rowIndex*3-3+colIndex].textContent = getSymbol;
-    let i = 0;
-    for (let row of Object.values(data.board)) {
-        for (let col of Object.values(row)){
-            button = buttons.value[i];
+    if(buttons[rowIndex*3-3+colIndex].textContent!="x" ||buttons[rowIndex*3-3+colIndex].textContent!="o"){
+        buttons[rowIndex*3-3+colIndex].textContent = getSymbol();
+        board = {
+            "a": {
+                "1":"",
+                "2":"",
+                "3":"",
+            },
+            "b":{
+                "1":"",
+                "2":"",
+                "3":"",
+            },
+            "c":{
+                "1":"",
+                "2":"",
+                "3":"",
+            },
+        };
+        let i = 0;
+        for (let row of Object.values(data.board)) {
+            for (let col of Object.values(row)){
+                let button = buttons.value[i];
 
-            board.row.col = button.textContent;
-            i++;
+                board.row.col = button.textContent;
+                i++;
+            }
         }
+        let socket = getSocket();
+        socket.send(JSON.stringify({type:'update',board:board,sessionId:getSessionID}));
     }
-    let socket = getSocket();
-    socket.send(JSON.stringify({type:'update',board:board,sessionId:getSessionID}));
 }
 
 function handleButtonUnlock(){

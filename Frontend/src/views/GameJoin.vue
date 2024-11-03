@@ -10,11 +10,11 @@
 <script setup>
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
 import { RouterLink } from 'vue-router';
+import { getSocket,sendCode } from '@/ServiceWebsocket';
 </script>
 <script>
 function check_code(code){
-    socket.send(JSON.stringify({type:"join",sessionId:code}))
-    
+    sendCode(code)
 }
 
 </script>

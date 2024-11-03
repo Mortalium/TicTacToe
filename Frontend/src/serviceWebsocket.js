@@ -6,8 +6,8 @@ const emitter = mitt();
 export const eventBus = emitter;
 
 var sessionId;
-
 var symbol;
+var socket;
 
 export function initializeSocket() {
   socket = new WebSocket('ws://localhost:3000');
@@ -35,12 +35,11 @@ export function initializeSocket() {
     }else if(data.type === 'new_response'){
       setSessionID(data.sessionId);
     }
+  };
   socket.onclose = () => console.log('Socket geschlossen');
   return socket;
 }
 
-
-};
 export function getSocket() {
   return socket;
 }
@@ -48,16 +47,16 @@ export function sendCode(code){
   socket.send(JSON.stringify({type:"join",sessionId:code}))
 }
 
-export function setSessionID(sessionId){
-  this.sessionId = sessionId;
+export function setSessionID(id){
+  sessionId = id;
 }
 
 export function getSessionID(){
-  return this.sessionId;
+  return sessionId;
 }
 
-export function setSymbol(symbol){
-  this.symbol = symbol;
+export function setSymbol(sb){
+  symbol = sb;
 }
 
 export function getSymbol(){

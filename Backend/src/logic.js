@@ -1,17 +1,8 @@
-const db = require('./index')
+//const db = require('./index');
 
-exports.startGame = () => {
-    db.run('INSERT INTO data_sets (data_json) VALUES (?)',[""], function(err){
-        if(err){
-            return console.log('Fehler beim Hinzufügen:', err.message);
-        }
-        return this.lastID;
-    });
-};
 
-exports.updateGame = (req, sessionID) => {
-    db.run('UPDATE data_sets SET data_json = ? WHERE sessionID = ?', [req, sessionID]);
-};
+
+
 
 exports.checkWinner = ( board) => {
     for (let row of Object.values(board)) {

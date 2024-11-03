@@ -1,7 +1,7 @@
 const express = require("express");
 const http = require('http');
 const WebSocket = require('ws');
-const sqlite3 = require('sqlite3')
+const sqlite3 = require('sqlite3').verbose()
 const path = require('path');
 
 const app = express();
@@ -19,46 +19,116 @@ const db = new sqlite3.Database(dbPath, (err) => {
         console.log('Verbindung zur Datenbank erfolgreich');
     }
 });
+
 module.exports = db;
+
+startGame = () => {
+    db.run('INSERT INTO data_sets (data_json,players) VALUES (?,?)',["","[]"], function(err){
+        if(err){
+            return console.log('Fehler beim Hinzufügen:', err.message);
+        }
+        return this.lastID;
+    });
+};
+
+updateGame = (req, sessionID) => {
+    db.run('UPDATE data_sets SET data_json = ? WHERE sessionID = ?', [req, sessionID]);
+};
+
+async function addPlayer(ws,sessionId){
+    let playersArray = await getPlayers(sessionId);
+    if(playersArray){
+        playersArray.push(ws);
+        console.log(playersArray);
+        console.log(JSON.stringify(playersArray));
+        console.log(JSON.parse(JSON.stringify(playersArray)));
+        db.run("UPDATE data_sets SET players = ? WHERE sessionID = ?",[JSON.stringify(playersArray),sessionId]);
+    }
+}
+
+async function getPlayers(sessionId){
+    return new Promise((resolve, reject) => {
+        db.get("SELECT players FROM data_sets WHERE sessionID = ?", [sessionId], (err, row) => {
+            if (err) {
+                console.error('Fehler beim Abrufen der Spieler:', err.message);
+                return reject(err);
+            }
+            if (row) {
+                const playersArray = JSON.parse(row.players);
+                resolve(playersArray);
+            } else {
+                resolve(JSON.parse("[]"));
+            }
+        });
+    });
+}
 
 const gameLocked = false;
 var otherPlayer;
+var sessionId;
 
 let sessions = {}
 
-wss.on('connection', (ws, req) => {
-    ws.on('message', (message) => {
-        const data = JSON.parse(message);
-        if(sessions[sessionId]){
+async function setOtherPlayer(ws,data) {
+    if(data.sessionId!=undefined){
+        sessionId = data.sessionId;
+        const players = await getPlayers(sessionId);
+        if(players){
+            sessions[sessionId] = players;
+            console.log(sessions[sessionId]);
             sessions[sessionId].forEach(client => {
                 if (client !== ws) {
                     otherPlayer = client;
                 }
             });
         }
+    }
+}
+
+wss.on('connection', (ws, req) => {
+    ws.on('message', (message) => {
+        const data = JSON.parse(message);
+        console.log(data);
+        if(data.sessionId!=undefined){
+            sessionId = data.sessionId;
+            console.log(sessions[sessionId]);
+            console.log(sessions);
+            if(sessions[sessionId]){
+                console.log(sessions[sessionId]);
+                sessions[sessionId].forEach(client => {
+                    if (client !== ws) {
+                        otherPlayer = client;
+                    }
+                });
+            }
+        }
         if (data.type === 'join') {
             if (sessions[sessionId] != null){
                 
-                const sessionId = data.sessionId;
-
+                //addPlayer(ws,sessionId);
+                console.log(sessions[sessionId]);
+                
                 sessions[sessionId].push(ws);
 
                 otherPlayer.send(JSON.stringify({type: 'unlock'}));
 
-                ws.send(JSON.stringify({type: 'validation', valid:true}))
+                console.log("joining succsessfull");
+
+                ws.send(JSON.stringify({type: 'validation', valid:true}));
             } else {
-                ws.send(JSON.stringify({type: 'validation', valid:false}))
+                ws.send(JSON.stringify({type: 'validation', valid:false}));
             }
         
         } else if (data.type === "new") {
-            const sessionId = this.startGame()
-            sessions[sessionId] = [];
+            sessionId = startGame();
+            //addPlayer(ws,sessionId);
+            sessions[sessionId]=[];
             sessions[sessionId].push(ws);
-            ws.send(JSON.stringify({type: 'new_response', sessionID: sessionId}))
+            console.log(sessions[sessionId]);
+            ws.send(JSON.stringify({type: 'new_response', sessionID: sessionId}));
 
         } else if (data.type === "update") {
-            const sessionId = data.sessionId;
-            logic.updateGame(data.board, sessionId);
+            updateGame(data.board, sessionId);
             otherPlayer.send(JSON.stringify({ type: 'update', board: data.board }));
 
             winnerVar = logic.checkWinner(data.board);
@@ -80,11 +150,6 @@ wss.on('connection', (ws, req) => {
             }
         } 
     });
-  });
-
-app.get("/api/", (req, res) => {
-    res.send("Hello express world");
 });
 
-
-app.listen(3000);
+server.listen(3000);

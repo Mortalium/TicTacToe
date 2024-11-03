@@ -22,7 +22,7 @@ function handleButtonUpdate(data){
         for (let col of Object.values(row)){
             button = buttons.value[i];
 
-            button.textContent = col.value
+            button.textContent = col.value;
             i++;
         }
     }
@@ -45,7 +45,7 @@ function sendData(rowIndex,colIndex){
             "2":"",
             "3":"",
         },
-    }
+    };
     buttons[rowIndex*3-3+colIndex].textContent = getSymbol;
     let i = 0;
     for (let row of Object.values(data.board)) {
@@ -57,7 +57,7 @@ function sendData(rowIndex,colIndex){
         }
     }
     let socket = getSocket();
-    socket.send(JSON.stringify({type:'update',board:board,sessionId:getSessionID}))
+    socket.send(JSON.stringify({type:'update',board:board,sessionId:getSessionID}));
 }
 
 function handleButtonUnlock(){

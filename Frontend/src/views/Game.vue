@@ -2,6 +2,7 @@
 <DisplayPedestal>
     <div class="column">
         <p class="session-id">Session ID: {{ sessionId }}</p>
+        <p class="your-turn">Your Turn: {{ yourTurn ? 'Yes' : 'No' }}</p>
 
         <div class="row" v-for="rowIndex in 3" :key="rowIndex">
             <button v-for="colIndex in 3" :key="colIndex" :id="`${rowIndex * 3 - 3 + colIndex}`" ref="buttons" @click="sendData(rowIndex,colIndex)" :disabled="areButtonsDisabled">{{ rowIndex * 3 - 3 + colIndex }}</button>
@@ -43,15 +44,17 @@ onUnmounted(() => {
 <script>
 const buttons = ref([]);
 var areButtonsDisabled = ref(true);
-var yourTurn = false;
-var sessionId;
+var yourTurn = ref(false);
+var sessionId = ref(null);
 
 function updateYourTurn(yT){
-    yourTurn = yT;
+    console.log(yT);
+    yourTurn.value = yT;
 }
 
 function setSessionID(sID){
-    sessionId = sID;
+    console.log(sID);
+    sessionId.value = sID;
 }
 
 function handleButtonUpdate(data){
@@ -121,7 +124,7 @@ function handleButtonLock(){
   padding-top: 60px;
 }
 
-.session-id {
+.session-id{
   position: absolute;
   top: 10px;
   right: 10px;

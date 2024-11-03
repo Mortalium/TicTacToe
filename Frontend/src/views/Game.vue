@@ -12,7 +12,7 @@
 <script setup>
 import DisplayPedestal from "@/components/DisplayPedastel.vue"
 import { ref,onMounted, onUnmounted } from 'vue';
-import { eventBus,getSocket,getSessionID,getSymbol } from '@/serviceWebsocket'
+import { eventBus,getSocket,getSessionID,getSymbol} from '@/serviceWebsocket'
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -23,7 +23,9 @@ onMounted(() => {
     eventBus.on('buttonLock', handleButtonLock);
     eventBus.on('navigate',(path)=>{
         router.push(path);
-    })
+    });
+    eventBus.on('updateYourTurn',updateYourTurn);
+    eventBus.on('setSessionID',setSessionID);
 });
 
 onUnmounted(() => {
@@ -32,15 +34,25 @@ onUnmounted(() => {
     eventBus.off('buttonLock', handleButtonLock);
     eventBus.off('navigate',(path)=>{
         router.push(path);
-    })
+    });
+    eventBus.off('updateYourTurn',updateYourTurn);
+    eventBus.off('setSessionID',setSessionID);
 });
 
 </script>
 <script>
 const buttons = ref([]);
 var areButtonsDisabled = ref(true);
-const sessionId = getSessionID();
+var yourTurn = false;
+var sessionId;
 
+function updateYourTurn(yT){
+    yourTurn = yT;
+}
+
+function setSessionID(sID){
+    sessionId = sID;
+}
 
 function handleButtonUpdate(data){
     let i = 0;

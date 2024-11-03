@@ -13,11 +13,34 @@
 import DisplayPedestal from "@/components/DisplayPedastel.vue"
 import { ref,onMounted, onUnmounted } from 'vue';
 import { eventBus,getSocket,getSessionID,getSymbol } from '@/serviceWebsocket'
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+onMounted(() => {
+    eventBus.on('buttonUpdate', handleButtonUpdate);
+    eventBus.on('buttonUnlock', handleButtonUnlock);
+    eventBus.on('buttonLock', handleButtonLock);
+    eventBus.on('navigate',(path)=>{
+        router.push(path);
+    })
+});
+
+onUnmounted(() => {
+    eventBus.off('buttonUpdate', handleButtonUpdate);
+    eventBus.off('buttonUnlock', handleButtonUnlock);
+    eventBus.off('buttonLock', handleButtonLock);
+    eventBus.off('navigate',(path)=>{
+        router.push(path);
+    })
+});
+
 </script>
 <script>
 const buttons = ref([]);
-const areButtonsDisabled = ref(true);
+var areButtonsDisabled = ref(true);
 const sessionId = getSessionID();
+
 
 function handleButtonUpdate(data){
     let i = 0;
@@ -71,20 +94,11 @@ function handleButtonLock(){
     areButtonsDisabled=true;
 }
 
-onMounted(() => {
-    eventBus.on('buttonUpdate', handleButtonUpdate);
-    eventBus.on('buttonUnlock', handleButtonUnlock);
-    eventBus.on('buttonLock', handleButtonLock);
-});
 
-onUnmounted(() => {
-    eventBus.off('buttonUpdate', handleButtonUpdate);
-    eventBus.off('buttonUnlock', handleButtonUnlock);
-    eventBus.off('buttonLock', handleButtonLock);
-});
 </script>
 
 <style scoped>
+
 .column {
   display: flex;
   flex-direction: column;

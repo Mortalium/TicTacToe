@@ -1,7 +1,7 @@
 <template>
 <DisplayPedastel>
     <form>
-        <input type="Code">
+        <input type="Code" required>
         <RouterLink to="/Game"><button>Join</button></RouterLink>
     </form>
 </DisplayPedastel>

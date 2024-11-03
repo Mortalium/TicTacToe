@@ -1,6 +1,6 @@
 <template>
 <DisplayPedastel>
-  <RouterLink to="/Game"> <button>New Game</button></RouterLink>
+  <RouterLink to="/Game"> <button onclick="new_game()">New Game</button></RouterLink>
   <RouterLink to="/GameJoin"><button>Join Game</button></RouterLink>
 </DisplayPedastel>
 </template>
@@ -8,6 +8,13 @@
 <script setup>
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
 import { RouterLink } from 'vue-router';
+</script>
+<script>
+const socket = new WebSocket('ws://localhost:3000');
+function new_game(){
+  socket.send(JSON.stringify({type:"new"}));
+}
+
 </script>
   
   <style scoped>

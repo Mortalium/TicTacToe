@@ -11,4 +11,7 @@
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
 import { RouterLink } from 'vue-router';
 </script>
+<script>
+
+</script>
 <style></style>

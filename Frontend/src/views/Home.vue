@@ -8,7 +8,7 @@
 <script setup>
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
 import { RouterLink } from 'vue-router';
-import { initializeSocket } from '@/ServiceWebsocket';
+import { initializeSocket } from '@/serviceWebsocket';
 </script>
 <script>
 const socket = new WebSocket('ws://localhost:3000');

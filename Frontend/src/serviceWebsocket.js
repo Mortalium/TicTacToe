@@ -1,4 +1,3 @@
-import { useRouter } from 'vue-router';
 import mitt from 'mitt';
 
 const emitter = mitt();
@@ -8,28 +7,30 @@ export const eventBus = emitter;
 var sessionId;
 var symbol;
 var socket;
+var yourTurn=false;
 
 export function initializeSocket() {
   socket = new WebSocket('ws://localhost:3000');
   socket.onopen = () => console.log('Socket verbunden');
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    const router = useRouter();
     if (data.type === 'update') {
       emitter.emit('buttonUpdate',data);
     }else if(data.type === 'win'){
-      router.push("/Won")
+      emitter.emit('navigate',"/Won");
     }else if(data.type === 'loss'){
-      router.push("/Lost")
+      emitter.emit('navigate',"/Lost");
     }else if(data.type === 'even'){
-      router.push("/Even")
+      emitter.emit('navigate',"/Even");
     } else if(data.type === 'unlock'){
       emitter.emit('buttonUnlock');
+      yourTurn = true;
     }else if(data.type === 'lock'){
       emitter.emit('buttonLock');
-    }else if(data.tyoe === 'validation'){
+      yourTurn = false;
+    }else if(data.type === 'validation'){
       if(data.valid){
-        router.push('/Game');
+        emitter.emit('navigate',"/Game");
         setSymbol("o");
       }
     }else if(data.type === 'new_response'){
@@ -61,4 +62,8 @@ export function setSymbol(sb){
 
 export function getSymbol(){
   return symbol;
+}
+
+export function getYourTurn(){
+  return yourTurn;
 }

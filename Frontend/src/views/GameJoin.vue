@@ -9,8 +9,24 @@
 </template>
 <script setup>
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
-import { ref } from 'vue';
-import { sendCode } from '@/serviceWebsocket';
+import { onMounted, onUnmounted, ref } from 'vue';
+import { eventBus,sendCode } from '@/serviceWebsocket';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+onMounted(()=>{
+    eventBus.on('navigate',(path)=>{
+        router.push(path);
+    });
+});
+
+onUnmounted(()=>{
+    eventBus.off('navigate',(path)=>{
+        router.push(path);
+    });
+});
+
 </script>
 <script>
 const join_code = ref('');

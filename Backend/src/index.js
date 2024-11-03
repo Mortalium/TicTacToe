@@ -20,16 +20,23 @@ const db = new sqlite3.Database(dbPath, (err) => {
     }
 });
 
-module.exports = db;
+//module.exports = db;
 
-startGame = () => {
-    db.run('INSERT INTO data_sets (data_json,players) VALUES (?,?)',["","[]"], function(err){
-        if(err){
-            return console.log('Fehler beim Hinzufügen:', err.message);
-        }
-        return this.lastID;
+async function initialise_Session(){
+    return new Promise((resolve, reject) => {
+        db.run('INSERT INTO data_sets (data_json,players) VALUES (?,?)',["","[]"], function(err){
+            if(err){
+                console.log('Fehler beim Hinzufügen:', err.message);
+                return reject(err);
+            }
+            resolve(this.lastID)
+        });
     });
 };
+
+async function startGame() {
+    return await initialise_Session();
+}
 
 updateGame = (req, sessionID) => {
     db.run('UPDATE data_sets SET data_json = ? WHERE sessionID = ?', [req, sessionID]);
@@ -69,6 +76,8 @@ var sessionId;
 
 let sessions = {}
 
+let players = [];
+/*
 async function setOtherPlayer(ws,data) {
     if(data.sessionId!=undefined){
         sessionId = data.sessionId;
@@ -84,14 +93,14 @@ async function setOtherPlayer(ws,data) {
         }
     }
 }
-
+*/
 wss.on('connection', (ws, req) => {
     ws.on('message', (message) => {
         const data = JSON.parse(message);
         console.log(data);
-        if(data.sessionId!=undefined){
+        if(data.type!='new'){
             sessionId = data.sessionId;
-            console.log(sessions[sessionId]);
+            /*console.log(sessions[sessionId]);
             console.log(sessions);
             if(sessions[sessionId]){
                 console.log(sessions[sessionId]);
@@ -100,33 +109,41 @@ wss.on('connection', (ws, req) => {
                         otherPlayer = client;
                     }
                 });
+            }*/
+           players.forEach(client => {
+            if(client !== ws) {
+                otherPlayer = client;
             }
+           })
         }
         if (data.type === 'join') {
-            if (sessions[sessionId] != null){
+            //if (sessions[sessionId] != null){
                 
                 //addPlayer(ws,sessionId);
-                console.log(sessions[sessionId]);
+                //console.log(sessions[sessionId]);
                 
-                sessions[sessionId].push(ws);
+                //sessions[sessionId].push(ws);
+                players[2]=ws;
 
                 otherPlayer.send(JSON.stringify({type: 'unlock'}));
 
                 console.log("joining succsessfull");
 
                 ws.send(JSON.stringify({type: 'validation', valid:true}));
-            } else {
-                ws.send(JSON.stringify({type: 'validation', valid:false}));
-            }
+            //} else {
+            //    ws.send(JSON.stringify({type: 'validation', valid:false}));
+            //}
         
         } else if (data.type === "new") {
-            sessionId = startGame();
+            startGame().then((id)=>{
+                console.log(id);
+                ws.send(JSON.stringify({type: 'new_response', sessionID: id}));
+            });
             //addPlayer(ws,sessionId);
-            sessions[sessionId]=[];
-            sessions[sessionId].push(ws);
-            console.log(sessions[sessionId]);
-            ws.send(JSON.stringify({type: 'new_response', sessionID: sessionId}));
-
+            //sessions[sessionId]=[];
+            //sessions[sessionId].push(ws);
+            //console.log(sessions[sessionId]);
+            players[1]=ws;
         } else if (data.type === "update") {
             updateGame(data.board, sessionId);
             otherPlayer.send(JSON.stringify({ type: 'update', board: data.board }));

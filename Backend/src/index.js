@@ -2,6 +2,7 @@ const express = require("express");
 const http = require('http');
 const WebSocket = require('ws');
 const sqlite3 = require('sqlite3')
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -9,7 +10,9 @@ const wss = new WebSocket.Server({ server });
 
 const logic = require('./logic');
 
-const db = new sqlite3.Database("../res/game_data.db", (err) => {
+const dbPath = path.join(__dirname, '../res/game_data.db');
+
+const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Datenbank konnte nicht geöffnet werden:', err.message);
     } else {

@@ -2,7 +2,7 @@
 <DisplayPedestal>
     <div class="column">
         <div class="row" v-for="rowIndex in 3" :key="rowIndex">
-            <button v-for="colIndex in 3" :key="colIndex" :id="`${rowIndex * 3 - 3 + colIndex}`" ref="buttons" @click="sendData(rowIndex,colIndex)">{{ rowIndex * 3 - 3 + colIndex }}</button>
+            <button v-for="colIndex in 3" :key="colIndex" :id="`${rowIndex * 3 - 3 + colIndex}`" ref="buttons" @click="sendData(rowIndex,colIndex)" :disabled="areButtonsDisabled">{{ rowIndex * 3 - 3 + colIndex }}</button>
         </div>
     </div>
 </DisplayPedestal>
@@ -14,6 +14,8 @@ import { eventBus,getSocket,getSessionID,getSymbol } from '@/serviceWebsocket'
 </script>
 <script>
 const buttons = ref([]);
+const areButtonsDisabled = ref(true);
+
 function handleButtonUpdate(data){
     let i = 0;
     for (let row of Object.values(data.board)) {
@@ -58,11 +60,23 @@ function sendData(rowIndex,colIndex){
     socket.send(JSON.stringify({type:'update',board:board,sessionId:getSessionID}))
 }
 
+function handleButtonUnlock(){
+    areButtonsDisabled=false;
+}
+
+function handleButtonLock(){
+    areButtonsDisabled=true;
+}
+
 onMounted(() => {
     eventBus.on('buttonUpdate', handleButtonUpdate);
+    eventBus.on('buttonUnlock', handleButtonUnlock);
+    eventBus.on('buttonLock', handleButtonLock);
 });
 
 onUnmounted(() => {
     eventBus.off('buttonUpdate', handleButtonUpdate);
+    eventBus.off('buttonUnlock', handleButtonUnlock);
+    eventBus.off('buttonLock', handleButtonLock);
 });
 </script>

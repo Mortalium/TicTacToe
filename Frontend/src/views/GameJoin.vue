@@ -10,7 +10,7 @@
 <script setup>
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
 import { RouterLink } from 'vue-router';
-import { sendCode } from '@/ServiceWebsocket';
+import { sendCode } from '@/serviceWebsocket';
 </script>
 <script>
 function check_code(code){

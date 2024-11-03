@@ -8,7 +8,7 @@
 <script setup>
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
 import { RouterLink } from 'vue-router';
-import { initializeSocket,setSymbol } from '@/ServiceWebsocket';
+import { initializeSocket,setSymbol } from '@/serviceWebsocket';
 </script>
 <script>
 function new_game(){

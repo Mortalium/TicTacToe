@@ -15,7 +15,7 @@ export function initializeSocket() {
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (data.type === 'update') {
-      emitter.emit('buttonUpdate',data)
+      emitter.emit('buttonUpdate',data);
     }else if(data.type === 'win'){
   
     }else if(data.type === 'loss'){
@@ -23,9 +23,9 @@ export function initializeSocket() {
     }else if(data.type === 'even'){
       
     } else if(data.type === 'unlock'){
-      
+      emitter.emit('buttonUnlock');
     }else if(data.type === 'lock'){
-      
+      emitter.emit('buttonLock');
     }else if(data.tyoe === 'validation'){
       if(data.valid){
         const router = useRouter();

@@ -1,6 +1,8 @@
 <template>
 <DisplayPedestal>
     <div class="column">
+        <p class="session-id">Session ID: {{ sessionId }}</p>
+
         <div class="row" v-for="rowIndex in 3" :key="rowIndex">
             <button v-for="colIndex in 3" :key="colIndex" :id="`${rowIndex * 3 - 3 + colIndex}`" ref="buttons" @click="sendData(rowIndex,colIndex)" :disabled="areButtonsDisabled">{{ rowIndex * 3 - 3 + colIndex }}</button>
         </div>
@@ -15,6 +17,7 @@ import { eventBus,getSocket,getSessionID,getSymbol } from '@/serviceWebsocket'
 <script>
 const buttons = ref([]);
 const areButtonsDisabled = ref(true);
+const sessionId = getSessionID();
 
 function handleButtonUpdate(data){
     let i = 0;
@@ -80,3 +83,28 @@ onUnmounted(() => {
     eventBus.off('buttonLock', handleButtonLock);
 });
 </script>
+
+<style scoped>
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding-top: 60px;
+}
+
+.session-id {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  color: #333;
+}
+
+
+</style>

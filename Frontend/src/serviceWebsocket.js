@@ -14,21 +14,21 @@ export function initializeSocket() {
   socket.onopen = () => console.log('Socket verbunden');
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
+    const router = useRouter();
     if (data.type === 'update') {
       emitter.emit('buttonUpdate',data);
     }else if(data.type === 'win'){
-  
+      router.push("/Won")
     }else if(data.type === 'loss'){
-      
+      router.push("/Lost")
     }else if(data.type === 'even'){
-      
+      router.push("/Even")
     } else if(data.type === 'unlock'){
       emitter.emit('buttonUnlock');
     }else if(data.type === 'lock'){
       emitter.emit('buttonLock');
     }else if(data.tyoe === 'validation'){
       if(data.valid){
-        const router = useRouter();
         router.push('/Game');
         setSymbol("o");
       }

@@ -9,33 +9,26 @@ import { RouterLink, RouterView } from 'vue-router';
 </template>
 
 <style>
-#app {
+body, #app {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #b3e5fc; /* Pastellblauer Hintergrund */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    background-color: #b3e5fc;
-}
-
-h1 {
-    font-size: 48px;
-    font-weight: bold;
-    margin-bottom: 50px;
-    border-bottom: 2px solid black;
-    padding-bottom: 10px;
+    text-align: center;
 }
 
 button {
     width: 200px;
     padding: 15px;
-    margin: 10px 0;
+    margin: 10px 0; /* Abstand zwischen den Buttons */
     font-size: 20px;
     border: 2px solid black;
-    background-color: #ffffff;
+    background-color: #ffffff; /* Weißer Hintergrund für die Buttons */
     color: black;
     cursor: pointer;
     border-radius: 5px;
@@ -43,7 +36,14 @@ button {
 }
 
 button:hover {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0; /* Leicht grauer Hintergrund beim Hover */
+}
+
+h1 {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 50px;
+    color: black; /* Titel in Schwarz */
 }
 
 </style>

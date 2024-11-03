@@ -7,7 +7,7 @@
 .topNav{
     height: 10vh;
     width: 100vw;
-    background-color: grey;
+    background-color: #b3e5fc;
     margin-bottom: 2vh;
 }
 

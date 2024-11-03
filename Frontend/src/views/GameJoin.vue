@@ -2,7 +2,7 @@
 <DisplayPedastel>
     <form>
         <input type="number" id="join_code" required>
-        <RouterLink to="/Game"><button onclick="check_code(join_code)">Join</button></RouterLink>
+        <button onclick="check_code(join_code)">Join</button>
     </form>
 </DisplayPedastel>
 
@@ -10,7 +10,7 @@
 <script setup>
 import DisplayPedastel from '@/components/DisplayPedastel.vue';
 import { RouterLink } from 'vue-router';
-import { getSocket,sendCode } from '@/ServiceWebsocket';
+import { sendCode } from '@/serviceWebsocket';
 </script>
 <script>
 function check_code(code){

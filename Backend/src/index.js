@@ -44,9 +44,10 @@ wss.on('connection', (ws, req) => {
             }
         
         } else if (data.type === "new") {
-            sessionId = this.startGame()
+            const sessionId = this.startGame()
             sessions[sessionId] = [];
             sessions[sessionId].push(ws);
+            ws.send(JSON.stringify({type: 'new_response', sessionID: sessionId}))
 
         } else if (data.type === "update") {
             const sessionId = data.sessionId;

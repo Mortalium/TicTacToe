@@ -34,9 +34,11 @@ exports.checkWinner = (board) => {
 
 exports.isBoardFull = (board) => {
     for (let row of Object.values(board)) {
-        if (row[0] == "" || row[0] == '' || row[0] == undefined || row[1] == "" || row[1] == '' || row[1] == undefined || row[2] == "" || row[2] == '' || row[2] == undefined) {
-            return false;
+        for (let cell of Object.values(row)) {
+            if (cell === "" || cell === undefined) {
+                return false; 
+            }
         }
-        return true;
     }
+    return true; 
 }

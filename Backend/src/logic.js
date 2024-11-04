@@ -1,32 +1,23 @@
-//const db = require('./index');
-
-
-
-
-
 exports.checkWinner = (board) => {
-    // Überprüfen der Reihen
     for (let row of Object.values(board)) {
         if (row["1"] === row["2"] && row["2"] === row["3"] && row["1"] !== "") {
-            return row["1"]; // Gewinner gefunden
+            return row["1"];
         }
     }
 
-    // Überprüfen der Spalten
     const columns = ["1", "2", "3"];
     for (let col of columns) {
         if (board["a"][col] === board["b"][col] && board["b"][col] === board["c"][col] && board["a"][col] !== "") {
-            return board["a"][col]; // Gewinner gefunden
+            return board["a"][col]; 
         }
     }
 
-    // Überprüfen der Diagonalen
     if (board["a"]["1"] === board["b"]["2"] && board["b"]["2"] === board["c"]["3"] && board["a"]["1"] !== "") {
-        return board["a"]["1"]; // Gewinner gefunden
+        return board["a"]["1"];
     }
 
     if (board["a"]["3"] === board["b"]["2"] && board["b"]["2"] === board["c"]["1"] && board["a"]["3"] !== "") {
-        return board["a"]["3"]; // Gewinner gefunden
+        return board["a"]["3"]; 
     }
 
     return null;

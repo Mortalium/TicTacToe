@@ -1,6 +1,11 @@
 {
-  "dependencies": {
-    "mitt": "^3.0.1",
-    "path": "^0.12.7"
+  "name": "root",
+  "version": "1.0.0",
+  "scripts": {
+    "install-all": "npm install --prefix Frontend && npm install --prefix Backend",
+    "start-all": "concurrently \"npm run dev --prefix Frontend\" \"npm run start --prefix Backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   }
 }

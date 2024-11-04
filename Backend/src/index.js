@@ -22,7 +22,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 async function initialise_Session(){
     return new Promise((resolve, reject) => {
-        db.run('INSERT INTO data_sets (data_json,players) VALUES (?,?)',["","[]"], function(err){
+        db.run('INSERT INTO data_sets (data_json) VALUES (?)',[""], function(err){
             if(err){
                 console.log('Fehler beim Hinzufügen:', err.message);
                 return reject(err);
@@ -45,37 +45,24 @@ var sessionId;
 
 let sessions = {}
 
-let players = [];
-
 wss.on('connection', (ws, req) => {
     ws.on('message', (message) => {
         const data = JSON.parse(message);
         if(data.type!='new'){
             sessionId = data.sessionId;
-            /*console.log(sessions[sessionId]);
-            console.log(sessions);
             if(sessions[sessionId]){
-                console.log(sessions[sessionId]);
                 sessions[sessionId].forEach(client => {
                     if (client !== ws) {
                         otherPlayer = client;
                     }
                 });
-            }*/
-           players.forEach(client => {
-            if(client !== ws) {
-                otherPlayer = client;
             }
-           })
         }
         if (data.type === 'join') {
-            //if (sessions[sessionId] != null){
+            if (sessions[sessionId] != null && sessions[sessionId].length<2){
                 
-                //addPlayer(ws,sessionId);
-                //console.log(sessions[sessionId]);
                 
-                //sessions[sessionId].push(ws);
-                players[2]=ws;
+                sessions[sessionId].push(ws);
 
                 otherPlayer.send(JSON.stringify({type: 'unlock'}));
 
@@ -84,19 +71,16 @@ wss.on('connection', (ws, req) => {
                 ws.send(JSON.stringify({type: 'validation', valid:true}));
                 ws.send(JSON.stringify({type:'join_response',sessionId:sessionId}));
                 otherPlayer.send(JSON.stringify({type:'changeTurn',yourTurn:true}));
-            //} else {
-            //    ws.send(JSON.stringify({type: 'validation', valid:false}));
-            //}
+            } else {
+                ws.send(JSON.stringify({type: 'validation', valid:false}));
+            }
         
         } else if (data.type === "new") {
             startGame().then((id)=>{
                 ws.send(JSON.stringify({type: 'new_response', sessionId: id}));
+                sessions[id]=[];
+                sessions[id].push(ws);
             });
-            //addPlayer(ws,sessionId);
-            //sessions[sessionId]=[];
-            //sessions[sessionId].push(ws);
-            //console.log(sessions[sessionId]);
-            players[1]=ws;
         } else if (data.type === "update") {
 
             updateGame(data.board, sessionId);

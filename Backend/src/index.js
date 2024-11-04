@@ -20,8 +20,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
     }
 });
 
-//module.exports = db;
-
 async function initialise_Session(){
     return new Promise((resolve, reject) => {
         db.run('INSERT INTO data_sets (data_json,players) VALUES (?,?)',["","[]"], function(err){
@@ -39,65 +37,19 @@ async function startGame() {
 }
 
 updateGame = (req, sessionID) => {
-    db.run('UPDATE data_sets SET data_json = ? WHERE sessionID = ?', [req, sessionID]);
+    db.run('UPDATE data_sets SET data_json = ? WHERE sessionID = ?', [JSON.stringify(req), sessionID]);
 };
 
-async function addPlayer(ws,sessionId){
-    let playersArray = await getPlayers(sessionId);
-    if(playersArray){
-        playersArray.push(ws);
-        console.log(playersArray);
-        console.log(JSON.stringify(playersArray));
-        console.log(JSON.parse(JSON.stringify(playersArray)));
-        db.run("UPDATE data_sets SET players = ? WHERE sessionID = ?",[JSON.stringify(playersArray),sessionId]);
-    }
-}
-
-async function getPlayers(sessionId){
-    return new Promise((resolve, reject) => {
-        db.get("SELECT players FROM data_sets WHERE sessionID = ?", [sessionId], (err, row) => {
-            if (err) {
-                console.error('Fehler beim Abrufen der Spieler:', err.message);
-                return reject(err);
-            }
-            if (row) {
-                const playersArray = JSON.parse(row.players);
-                resolve(playersArray);
-            } else {
-                resolve(JSON.parse("[]"));
-            }
-        });
-    });
-}
-
-const gameLocked = false;
 var otherPlayer;
 var sessionId;
 
 let sessions = {}
 
 let players = [];
-/*
-async function setOtherPlayer(ws,data) {
-    if(data.sessionId!=undefined){
-        sessionId = data.sessionId;
-        const players = await getPlayers(sessionId);
-        if(players){
-            sessions[sessionId] = players;
-            console.log(sessions[sessionId]);
-            sessions[sessionId].forEach(client => {
-                if (client !== ws) {
-                    otherPlayer = client;
-                }
-            });
-        }
-    }
-}
-*/
+
 wss.on('connection', (ws, req) => {
     ws.on('message', (message) => {
         const data = JSON.parse(message);
-        console.log(data);
         if(data.type!='new'){
             sessionId = data.sessionId;
             /*console.log(sessions[sessionId]);
@@ -130,14 +82,15 @@ wss.on('connection', (ws, req) => {
                 console.log("joining succsessfull");
 
                 ws.send(JSON.stringify({type: 'validation', valid:true}));
+                ws.send(JSON.stringify({type:'join_response',sessionId:sessionId}));
+                otherPlayer.send(JSON.stringify({type:'changeTurn',yourTurn:true}));
             //} else {
             //    ws.send(JSON.stringify({type: 'validation', valid:false}));
             //}
         
         } else if (data.type === "new") {
             startGame().then((id)=>{
-                console.log(id);
-                ws.send(JSON.stringify({type: 'new_response', sessionID: id}));
+                ws.send(JSON.stringify({type: 'new_response', sessionId: id}));
             });
             //addPlayer(ws,sessionId);
             //sessions[sessionId]=[];
@@ -145,26 +98,22 @@ wss.on('connection', (ws, req) => {
             //console.log(sessions[sessionId]);
             players[1]=ws;
         } else if (data.type === "update") {
+
             updateGame(data.board, sessionId);
             otherPlayer.send(JSON.stringify({ type: 'update', board: data.board }));
 
-            winnerVar = logic.checkWinner(data.board);
+            let winnerVar = logic.checkWinner(data.board);
             if(winnerVar != null){
                 ws.send(JSON.stringify({type: 'win'}));
                 otherPlayer.send(JSON.stringify({ type: 'loss'}));
-                gameLocked = true;
-            }else if(logic.isBoardFull){
+            }else if(logic.isBoardFull(data.board)){
                 ws.send(JSON.stringify({ type: 'even'}));
                 otherPlayer.send(JSON.stringify({ type: 'even'}));
-                gameLocked = true;
-            } else{
-                ws.send(JSON.stringify({ type: 'lock'}));
-                otherPlayer.send(JSON.stringify({type: 'unlock'}));
-            }
-            if(gameLocked){
-                ws.send(JSON.stringify({type: 'lock'}));
-                otherPlayer.send(JSON.stringify({ type: 'lock'}));
-            }
+            } 
+            ws.send(JSON.stringify({ type: 'lock'}));
+            otherPlayer.send(JSON.stringify({type: 'unlock'}));
+            ws.send(JSON.stringify({type:'changeTurn',yourTurn:false}));
+            otherPlayer.send(JSON.stringify({type:'changeTurn',yourTurn:true}));
         } 
     });
 });

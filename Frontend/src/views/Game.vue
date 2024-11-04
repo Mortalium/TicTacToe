@@ -5,7 +5,7 @@
         <p class="your-turn">Your Turn: {{ yourTurn ? 'Yes' : 'No' }}</p>
 
         <div class="row" v-for="rowIndex in 3" :key="rowIndex">
-            <button v-for="colIndex in 3" :key="colIndex" :id="`${rowIndex * 3 - 3 + colIndex}`" ref="buttons" @click="sendData(rowIndex,colIndex)" :disabled="areButtonsDisabled">{{ rowIndex * 3 - 3 + colIndex }}</button>
+            <button v-for="colIndex in 3" :key="colIndex" :id="`${rowIndex * 3 - 3 + colIndex}`" :ref="addButtonRef" @click="sendData(rowIndex,colIndex)" :disabled="areButtonsDisabled"></button>
         </div>
     </div>
 </DisplayPedestal>
@@ -40,20 +40,20 @@ onUnmounted(() => {
     eventBus.off('setSessionID',setSessionID);
 });
 
-</script>
-<script>
 const buttons = ref([]);
+function addButtonRef(el) {
+  if (el) buttons.value.push(el);
+}
+
 var areButtonsDisabled = ref(true);
 var yourTurn = ref(false);
 var sessionId = ref(null);
 
 function updateYourTurn(yT){
-    console.log(yT);
     yourTurn.value = yT;
 }
 
 function setSessionID(sID){
-    console.log(sID);
     sessionId.value = sID;
 }
 
@@ -63,16 +63,17 @@ function handleButtonUpdate(data){
         for (let col of Object.values(row)){
             let button = buttons.value[i];
 
-            button.textContent = col.value;
+            button.textContent = col;
             i++;
         }
     }
 }
 
 function sendData(rowIndex,colIndex){
-    if(buttons[rowIndex*3-3+colIndex].textContent!="x" ||buttons[rowIndex*3-3+colIndex].textContent!="o"){
-        buttons[rowIndex*3-3+colIndex].textContent = getSymbol();
-        board = {
+    let idx = rowIndex*3-3+colIndex-1;
+    if(buttons.value[idx].textContent!="x" ||buttons.value[idx].textContent!="o"){
+        buttons.value[idx].textContent = getSymbol();
+        let board = {
             "a": {
                 "1":"",
                 "2":"",
@@ -90,16 +91,15 @@ function sendData(rowIndex,colIndex){
             },
         };
         let i = 0;
-        for (let row of Object.values(data.board)) {
-            for (let col of Object.values(row)){
+        for (let row of Object.keys(board)) {
+            for (let col of Object.keys(board[row])){
                 let button = buttons.value[i];
-
-                board.row.col = button.textContent;
+                board[row][col] = button.textContent;
                 i++;
             }
         }
         let socket = getSocket();
-        socket.send(JSON.stringify({type:'update',board:board,sessionId:getSessionID}));
+        socket.send(JSON.stringify({type:'update',board:board,sessionId:getSessionID()}));
     }
 }
 

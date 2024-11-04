@@ -24,12 +24,8 @@ export function initializeSocket() {
       emitter.emit('navigate',"/Even");
     } else if(data.type === 'unlock'){
       emitter.emit('buttonUnlock');
-      yourTurn = true;
-      emitter.emit('updateYourTurn',yourTurn);
     }else if(data.type === 'lock'){
-      emitter.emit('buttonLock');
-      yourTurn = false;
-      emitter.emit('updateYourTurn',yourTurn);
+      emitter.emit('buttonLock');   
     }else if(data.type === 'validation'){
       if(data.valid){
         emitter.emit('navigate',"/Game");
@@ -38,6 +34,12 @@ export function initializeSocket() {
     }else if(data.type === 'new_response'){
       setSessionID(data.sessionId);
       emitter.emit('setSessionID',data.sessionId);
+    }else if(data.type === 'join_response'){
+      setSessionID(data.sessionId);
+      emitter.emit('setSessionID',data.sessionId);
+    }else if(data.type === 'changeTurn'){
+      yourTurn = data.yourTurn;
+      emitter.emit('updateYourTurn',data.yourTurn);
     }
   };
   socket.onclose = () => console.log('Socket geschlossen');

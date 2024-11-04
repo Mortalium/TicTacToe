@@ -4,27 +4,29 @@
 
 
 
-exports.checkWinner = ( board) => {
+exports.checkWinner = (board) => {
+    // Überprüfen der Reihen
     for (let row of Object.values(board)) {
-        if (row[0] === row[1] && row[1] === row[2] && row[0] !== "") {
-            return row[0]; // Gewinner gefunden
+        if (row["1"] === row["2"] && row["2"] === row["3"] && row["1"] !== "") {
+            return row["1"]; // Gewinner gefunden
         }
     }
 
     // Überprüfen der Spalten
-    for (let col = 0; col < 3; col++) {
-        if (board.a[col] === board.b[col] && board.b[col] === board.c[col] && board.a[col] !== "") {
-            return board.a[col]; // Gewinner gefunden
+    const columns = ["1", "2", "3"];
+    for (let col of columns) {
+        if (board["a"][col] === board["b"][col] && board["b"][col] === board["c"][col] && board["a"][col] !== "") {
+            return board["a"][col]; // Gewinner gefunden
         }
     }
 
     // Überprüfen der Diagonalen
-    if (board.a[0] === board.b[1] && board.b[1] === board.c[2] && board.a[0] !== "") {
-        return board.a[0]; // Gewinner gefunden
+    if (board["a"]["1"] === board["b"]["2"] && board["b"]["2"] === board["c"]["3"] && board["a"]["1"] !== "") {
+        return board["a"]["1"]; // Gewinner gefunden
     }
 
-    if (board.a[2] === board.b[1] && board.b[1] === board.c[0] && board.a[2] !== "") {
-        return board.a[2]; // Gewinner gefunden
+    if (board["a"]["3"] === board["b"]["2"] && board["b"]["2"] === board["c"]["1"] && board["a"]["3"] !== "") {
+        return board["a"]["3"]; // Gewinner gefunden
     }
 
     return null;
@@ -32,7 +34,7 @@ exports.checkWinner = ( board) => {
 
 exports.isBoardFull = (board) => {
     for (let row of Object.values(board)) {
-        if (row[0] == "" || row[1] == "" || row[2] == "") {
+        if (row[0] == "" || row[0] == '' || row[0] == undefined || row[1] == "" || row[1] == '' || row[1] == undefined || row[2] == "" || row[2] == '' || row[2] == undefined) {
             return false;
         }
         return true;

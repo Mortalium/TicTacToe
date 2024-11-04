@@ -14,7 +14,7 @@ body, #app {
     padding: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #b3e5fc; /* Pastellblauer Hintergrund */
+    background-color: #b3e5fc; 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -25,10 +25,10 @@ body, #app {
 button {
     width: 200px;
     padding: 15px;
-    margin: 10px 0; /* Abstand zwischen den Buttons */
+    margin: 10px 0; 
     font-size: 20px;
     border: 2px solid black;
-    background-color: #ffffff; /* Weißer Hintergrund für die Buttons */
+    background-color: #ffffff; 
     color: black;
     cursor: pointer;
     border-radius: 5px;
@@ -36,14 +36,14 @@ button {
 }
 
 button:hover {
-    background-color: #f0f0f0; /* Leicht grauer Hintergrund beim Hover */
+    background-color: #f0f0f0;
 }
 
 h1 {
     font-size: 48px;
     font-weight: bold;
     margin-bottom: 50px;
-    color: black; /* Titel in Schwarz */
+    color: black;
 }
 
 </style>

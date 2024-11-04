@@ -2,8 +2,8 @@
   "name": "root",
   "version": "1.0.0",
   "scripts": {
-    "install-all": "npm install --prefix Frontend && npm install --prefix Backend",
-    "start-all": "concurrently \"npm run dev --prefix Frontend\" \"npm run start --prefix Backend\""
+    "install-all": "cd Frontend && npm install && cd .. && cd Backend && npm install && cd ..",
+    "start-all": "concurrently \"cd Frontend && npm run dev\" \"cd Backend && npm run start\""
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

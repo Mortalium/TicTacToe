@@ -10,6 +10,6 @@ installs dependencies in root package
 
 installs dependencies in sub packages
 
-4. > npm start-all
+4. > npm run start-all
 
 starts both Backend and Frontend servers
